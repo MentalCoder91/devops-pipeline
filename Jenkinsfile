@@ -12,6 +12,7 @@ pipeline{
             steps{
 
                 checkout scmGit(branches: [[name: '*/main']], extensions: [], userRemoteConfigs: [[url: 'https://github.com/MentalCoder91/devops-pipeline']])
+                sh 'pwd'
                 sh "mvn clean install"
             }
 
@@ -51,6 +52,33 @@ pipeline{
 
 
         }
+
+        stage('Print Workspace Directory') {
+            steps {
+                sh 'echo $WORKSPACE'
+                sh 'cat $HOME/.kube/config'
+            }
+        }
+
+        stage('Access File in Workspace') {
+            steps {
+                sh 'ls $WORKSPACE'
+                // Or you can directly reference the file
+                sh 'cat $WORKSPACE/k8s*.yaml'
+
+            }
+        }
+
+        stage('K8s Deploy') {
+            steps {
+                script {
+                    sh "kubectl --kubeconfig=$HOME/.kube/config apply -f $WORKSPACE/k8s*yaml"
+                }
+            }
+        }
+
+
+
 
 
 
